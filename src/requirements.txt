@@ -1,4 +1,0 @@
-sysrsync
-portainer-ce-api
-docker
-requests
