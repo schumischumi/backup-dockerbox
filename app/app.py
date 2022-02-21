@@ -170,9 +170,9 @@ else:
     stack_exclude = []
 for stack_id_item in stack_id_list:
     rsync_source = os.path.join(settings.PORTAINER_VOLUME_MOUNT,'.',stack_id_item['stack_name'])
-    if os.path.exists(rsync_source) and stack_exclude.count(stack_id_item['stack_name'].lower()) == 0:
+    if os.path.exists(rsync_source):
         logger.info("Portainer Volumes: Start Export" + stack_id_item['stack_name'])
-        if stack_id_item['stack_status'] == 1:
+        if stack_id_item['stack_status'] == 1 and stack_exclude.count(stack_id_item['stack_name'].lower()) == 0:
             try:
                 request_url = PORTAINER_URL + '/api/stacks/' + str(stack_id_item['stack_id']) + '/stop'
                 response = requests.request(
@@ -185,7 +185,7 @@ for stack_id_item in stack_id_list:
                 stack_stop_code = 0
                 while stack_stop_code != 2:
                     time.sleep(30)
-                    
+
                     payload={}
                     request_url = PORTAINER_URL + '/api/stacks/' + str(stack_id_item['stack_id'])
                     response = requests.request(    "GET", 
