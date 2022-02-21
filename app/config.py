@@ -23,4 +23,4 @@ class Settings():
         else:
             vars()[env_item['name']] = os.environ[env_item['name']]
 
-settings = Settings()  # 5
+settings = Settings() 

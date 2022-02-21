@@ -9,6 +9,7 @@ import re
 import datetime
 import sysrsync
 import os
+import time
 
 ### Backup: Initialize stage
 ## Initialize: Logger
@@ -86,6 +87,7 @@ logger.info("Portainer Config: Finished Export")
 logger.info("Portainer Config: Start Rsync Transfer")
 try: 
     rsync_source = backup_dir_portainer
+    logger.debug(rsync_source)
     logger.debug(rsync_destination)
     sysrsync.run(source=rsync_source,
                 destination=rsync_destination,
@@ -155,7 +157,7 @@ try:
                 options=[rsync_options])
 except Exception as e:
     logger.error('Exception when using rsync: ' + str(e))
-    exit()
+    exit(1)
 logger.info("Portainer YAMLs: Finished Rsync Transfer")
 logger.info("Portainer YAMLs: Finished Backup")
 
@@ -179,11 +181,26 @@ for stack_id_item in stack_id_list:
                                         headers=headers)
                 if response.status_code != 200:
                     logger.error('Call ' + request_url+ ' with non 200 status code: ' + str(response.status_code))
-                    exit()            
+                    exit(1)
+                stack_stop_code = 0
+                while stack_stop_code != 2:
+                    time.sleep(30)
+                    
+                    payload={}
+                    request_url = PORTAINER_URL + '/api/stacks/' + str(stack_id_item['stack_id'])
+                    response = requests.request(    "GET", 
+                                                    request_url, 
+                                                    headers=headers, 
+                                                    data=payload)
+
+                    stack_stop_repsonse  = response.json()            
+                    stack_stop_code = int(stack_stop_repsonse['Status'])
             except Exception as e:
                 logger.error('Exception when calling StacksApi->stack_stop with stack "' + stack_id_item['stack_name'] + '": ' + str(e))
-                exit()
+                exit(1)
         logger.info("Portainer Volumes: Finished Export" + stack_id_item['stack_name'])
+
+        
 
         logger.info("Portainer Volumes: Start Rsync Transfer" + stack_id_item['stack_name'])
         try:            
@@ -196,7 +213,7 @@ for stack_id_item in stack_id_list:
                         options=[rsync_options+'R'])
         except Exception as e:
             logger.error('Exception when using rsync: ' + str(e))
-            exit()
+            exit(1)
         logger.info("Portainer Volumes: Finished Rsync Transfer" + stack_id_item['stack_name'])
         if stack_id_item['stack_status'] == 1:
             try:
@@ -207,10 +224,10 @@ for stack_id_item in stack_id_list:
                                         headers=headers)
                 if response.status_code != 200:
                     logger.error('Call ' + request_url+ ' with non 200 status code: ' + str(response.status_code))
-                    exit()            
+                    exit(1)            
             except Exception as e:
                 logger.error('Exception when calling StacksApi->stack_start with stack "' + stack_id_item['stack_name'] + '": ' + str(e))
-                exit()
+                exit(1)
 
 logger.info("Portainer Volumes: Finished Export & Rsync Transfer")
 
