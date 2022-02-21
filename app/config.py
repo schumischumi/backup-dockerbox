@@ -10,7 +10,7 @@ class Settings():
         {'name':'PORTAINER_VOLUME_MOUNT', 'mandatory': True, 'default':''},
         {'name':'BACKUP_REMOTE_DIR', 'mandatory': True, 'default':''},
         {'name':'LOGLEVEL', 'mandatory': False, 'default':'INFO'},
-        {'name':'BACKUP_STACK_EXCLUDE', 'mandatory': False, 'default':''},
+        {'name':'BACKUP_STACK_EXCLUDE', 'mandatory': False, 'default':'-avzP'},
         {'name':'RSYNC_OPTIONS', 'mandatory': False, 'default':'-avzP'},
         {'name':'PORTAINER_EXPORT_PW', 'mandatory': False, 'default':''}
     ]

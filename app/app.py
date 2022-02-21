@@ -161,6 +161,8 @@ except Exception as e:
 logger.info("Portainer YAMLs: Finished Rsync Transfer")
 logger.info("Portainer YAMLs: Finished Backup")
 
+
+
 ## Backup: Volume Mouts
 logger.info("Portainer Volumes: Start Backup")
 logger.info("Portainer Volumes: Start Export & Rsync Transfer")
@@ -171,7 +173,7 @@ else:
 for stack_id_item in stack_id_list:
     rsync_source = os.path.join(settings.PORTAINER_VOLUME_MOUNT,'.',stack_id_item['stack_name'])
     if os.path.exists(rsync_source):
-        logger.info("Portainer Volumes: Start Export" + stack_id_item['stack_name'])
+        logger.info("Portainer Volumes: Start Export " + stack_id_item['stack_name'])
         if stack_id_item['stack_status'] == 1 and stack_exclude.count(stack_id_item['stack_name'].lower()) == 0:
             try:
                 request_url = PORTAINER_URL + '/api/stacks/' + str(stack_id_item['stack_id']) + '/stop'
@@ -198,11 +200,11 @@ for stack_id_item in stack_id_list:
             except Exception as e:
                 logger.error('Exception when calling StacksApi->stack_stop with stack "' + stack_id_item['stack_name'] + '": ' + str(e))
                 exit(1)
-        logger.info("Portainer Volumes: Finished Export" + stack_id_item['stack_name'])
+        logger.info("Portainer Volumes: Finished Export " + stack_id_item['stack_name'])
 
         
 
-        logger.info("Portainer Volumes: Start Rsync Transfer" + stack_id_item['stack_name'])
+        logger.info("Portainer Volumes: Start Rsync Transfer " + stack_id_item['stack_name'])
         try:            
             logger.debug(rsync_destination)
             logger.debug(rsync_source)
@@ -214,7 +216,7 @@ for stack_id_item in stack_id_list:
         except Exception as e:
             logger.error('Exception when using rsync: ' + str(e))
             exit(1)
-        logger.info("Portainer Volumes: Finished Rsync Transfer" + stack_id_item['stack_name'])
+        logger.info("Portainer Volumes: Finished Rsync Transfer " + stack_id_item['stack_name'])
         if stack_id_item['stack_status'] == 1:
             try:
                 request_url = PORTAINER_URL + '/api/stacks/' + str(stack_id_item['stack_id']) + '/start'
@@ -222,7 +224,7 @@ for stack_id_item in stack_id_list:
                                         "POST", 
                                         request_url, 
                                         headers=headers)
-                if response.status_code != 200:
+                if response.status_code != 200 and response.status_code != 409:
                     logger.error('Call ' + request_url+ ' with non 200 status code: ' + str(response.status_code))
                     exit(1)            
             except Exception as e:
